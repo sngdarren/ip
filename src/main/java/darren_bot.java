@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class darren_bot {
@@ -12,14 +13,23 @@ public class darren_bot {
                 + "____________________________________________________________ \n"
         );
 
+        ArrayList<String> outList = new ArrayList<>();
+
         while (true) {
             String line = scanner.nextLine();
             if (line.equals("bye")) {
                 System.out.println("Bye. Hope to see you again soon!");
                 break;
             }
+
+            else if (line.equals("list")) {
+                for (int i = 0; i < outList.size(); i++) {
+                    System.out.println(i + ": " + outList.get(i));
+                }
+            }
             else {
-                System.out.println(line);
+                System.out.println("added: " + line);
+                outList.add(line);
             }
         }
         scanner.close();
