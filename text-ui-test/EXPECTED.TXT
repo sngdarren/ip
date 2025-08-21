@@ -15,3 +15,5 @@ Got it. I've added this task:
 Now you have 3 tasks in the list
 OOPS!!! The description of a todo cannot be empty.
 OOPS!!! I'm sorry, but I don't know what that means :-(
+Noted. I've removed this task:[E][ ] project meeting  (from: Mon 2pm  to: 4pm)
+Now you have 2 tasks in the list.

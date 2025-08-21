@@ -105,9 +105,9 @@ public class darren_bot {
                     try {
                         String[] value = line.split(" ");
                         int second = Integer.parseInt(value[1]);
-                        Task currTask = outList.get(second);
-                        currTask.isDone = false;
-                        System.out.println("OK, I've marked this task as not done yet:" + currTask);
+                        Task currTask = outList.remove(second);
+                        System.out.println("Noted. I've removed this task:" + currTask + "\n"
+                                            + "Now you have " + outList.size() + " tasks in the list.");
                     } catch (IndexOutOfBoundsException e) {
                         throw new EmptyTaskException(taskType);
                     }
