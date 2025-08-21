@@ -3,11 +3,32 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class darren_bot {
+
+    enum Command {
+        BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, UNKNOWN;
+
+        static Command fromLine(String line) {
+            if (line == null || line.isBlank()) {
+                return UNKNOWN;
+            }
+            String first = line.split(" ")[0];
+            return switch (first) {
+                case "bye" -> BYE;
+                case "list" -> LIST;
+                case "mark" -> MARK;
+                case "unmark" -> UNMARK;
+                case "deadline" -> DEADLINE;
+                case "todo" -> TODO;
+                case "event" -> EVENT;
+                case "delete" -> DELETE;
+                default -> UNKNOWN;
+            };
+        }
+    }
+
     public static void main(String[] args) {
 //
         Scanner scanner = new Scanner(System.in);
-
-
         System.out.println("____________________________________________________________\n" +
                 "Hello! I'm darren_bot\n" +
                 "What can I do for you?\n" +
@@ -20,102 +41,98 @@ public class darren_bot {
                 break;
             }
             String line = scanner.nextLine();
-            String taskType = null;
+            Command c = Command.fromLine(line);
             try {
-                if (line.equals("bye")) {
-                    System.out.println("Bye. Hope to see you again soon!");
-                    break;
-                } else if (line.equals("list")) {
-                    for (int i = 0; i < outList.size(); i++) {
-                        System.out.println(i + ". " + outList.get(i));
+                switch (c) {
+                    case BYE -> {
+                        System.out.println("Bye. Hope to see you again soon!");
+                        return;
                     }
-
-                } else if (line.startsWith("mark")) {
-                    taskType = "mark";
-                    try {
-                        String[] value = line.split(" ");
-                        int second = Integer.parseInt(value[1]);
-                        Task currTask = outList.get(second);
-                        currTask.isDone = true;
-                        System.out.println("Nice! I've marked this task as done: " + currTask);
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new EmptyTaskException(taskType);
+                    case LIST -> {
+                        for (int i = 0; i < outList.size(); i++) {
+                            System.out.println(i + ". " + outList.get(i)); // keep your 0-based display
+                        }
                     }
-                } else if (line.startsWith("unmark")) {
-                    taskType = "unmark";
-                    try {
-                        String[] value = line.split(" ");
-                        int second = Integer.parseInt(value[1]);
-                        Task currTask = outList.get(second);
-                        currTask.isDone = false;
-                        System.out.println("OK, I've marked this task as not done yet:" + currTask);
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new EmptyTaskException(taskType);
+                    case MARK -> {
+                        try {
+                            String[] value = line.split(" ");
+                            int second = Integer.parseInt(value[1]);
+                            Task currTask = outList.get(second);
+                            currTask.isDone = true;
+                            System.out.println("Nice! I've marked this task as done: " + currTask);
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new EmptyTaskException("mark");
+                        }
                     }
-
-                } else if (line.startsWith("deadline")) {
-                    taskType = "deadline";
-                    try {
-                        int byIndex = line.indexOf("/by ");
-                        String deadline = line.substring(byIndex + 4);
-                        String description = line.substring(9, byIndex);
-                        Deadline newDeadline = new Deadline(description, deadline);
-                        outList.add(newDeadline);
-                        System.out.println("Got it. I've added this task:\n" +
-                                newDeadline + "\n" +
-                                "Now you have " + outList.size() + " tasks in the list");
-
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new EmptyTaskException(taskType);
+                    case UNMARK -> {
+                        try {
+                            String[] value = line.split(" ");
+                            int second = Integer.parseInt(value[1]);
+                            Task currTask = outList.get(second);
+                            currTask.isDone = false;
+                            System.out.println("OK, I've marked this task as not done yet:" + currTask);
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new EmptyTaskException("unmark");
+                        }
                     }
+                    case DEADLINE -> {
+                        try {
+                            int byIndex = line.indexOf("/by ");
+                            String deadline = line.substring(byIndex + 4);
+                            String description = line.substring(9, byIndex);
+                            Deadline newDeadline = new Deadline(description, deadline);
+                            outList.add(newDeadline);
+                            System.out.println("Got it. I've added this task:\n" +
+                                    newDeadline + "\n" +
+                                    "Now you have " + outList.size() + " tasks in the list");
 
-                } else if (line.startsWith("event")) {
-                    taskType = "event";
-                    try{
-                        int fromIndex = line.indexOf("/from ");
-                        int toIndex = line.indexOf("/to ");
-                        String from = line.substring(fromIndex + 6, toIndex);
-                        String to = line.substring(toIndex + 4);
-                        String description = line.substring(6, fromIndex);
-                        Event newEvent = new Event(description, from, to);
-                        outList.add(newEvent);
-                        System.out.println("Got it. I've added this task:\n" +
-                                newEvent + "\n" +
-                                "Now you have " + outList.size() + " tasks in the list");
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new EmptyTaskException(taskType);
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new EmptyTaskException("deadline");
+                        }
                     }
-
-                } else if (line.startsWith("todo")) {
-                    taskType = "todo";
-                    try {
-                        String description = line.substring(5);
-                        Todo newTodo = new Todo(description);
-                        outList.add(newTodo);
-                        System.out.println("Got it. I've added this task:\n" +
-                                newTodo + "\n" +
-                                "Now you have " + outList.size() + " tasks in the list");
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new EmptyTaskException(taskType);
+                    case EVENT -> {
+                        try {
+                            int fromIndex = line.indexOf("/from ");
+                            int toIndex = line.indexOf("/to ");
+                            String from = line.substring(fromIndex + 6, toIndex);
+                            String to = line.substring(toIndex + 4);
+                            String description = line.substring(6, fromIndex);
+                            Event newEvent = new Event(description, from, to);
+                            outList.add(newEvent);
+                            System.out.println("Got it. I've added this task:\n" +
+                                    newEvent + "\n" +
+                                    "Now you have " + outList.size() + " tasks in the list");
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new EmptyTaskException("event");
+                        }
                     }
-
+                    case TODO -> {
+                        try {
+                            String description = line.substring(5);
+                            Todo newTodo = new Todo(description);
+                            outList.add(newTodo);
+                            System.out.println("Got it. I've added this task:\n" +
+                                    newTodo + "\n" +
+                                    "Now you have " + outList.size() + " tasks in the list");
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new EmptyTaskException("todo");
+                        }
+                    }
+                    case DELETE -> {
+                        try {
+                            String[] value = line.split(" ");
+                            int second = Integer.parseInt(value[1]);
+                            Task currTask = outList.remove(second);
+                            System.out.println("Noted. I've removed this task:" + currTask + "\n"
+                                    + "Now you have " + outList.size() + " tasks in the list.");
+                        } catch (IndexOutOfBoundsException e) {
+                            throw new EmptyTaskException("delete");
+                        }
+                    }
+                    case UNKNOWN -> {
+                        throw new UnexpectedCommandException("OOPS!!! I'm sorry, but I don't know what that means :-(");
+                    }
                 }
-                else if (line.startsWith("delete")) {
-                    taskType = "delete";
-                    try {
-                        String[] value = line.split(" ");
-                        int second = Integer.parseInt(value[1]);
-                        Task currTask = outList.remove(second);
-                        System.out.println("Noted. I've removed this task:" + currTask + "\n"
-                                            + "Now you have " + outList.size() + " tasks in the list.");
-                    } catch (IndexOutOfBoundsException e) {
-                        throw new EmptyTaskException(taskType);
-                    }
-
-                } else {
-                    throw new UnexpectedCommandException("OOPS!!! I'm sorry, but I don't know what that means :-(");
-                }
-
             } catch (UnexpectedCommandException | EmptyTaskException e) {
                 System.out.println(e.getMessage());
             }
