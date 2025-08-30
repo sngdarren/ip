@@ -1,8 +1,19 @@
-import javax.sound.midi.SysexMessage;
+import java.util.List;
+import java.io.FileReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.File;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.nio.charset.StandardCharsets;
 
 public class darren_bot {
+
+    public static final String FILE_PATH = "data/duke.txt";
 
     enum Command {
         BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, UNKNOWN;
@@ -35,13 +46,25 @@ public class darren_bot {
                 "____________________________________________________________\n"
         );
 
-        ArrayList<Task> outList = new ArrayList<>();
+        String dataFile = FILE_PATH;
+        Path p = Paths.get(dataFile);
+
+        try {
+            Files.createDirectories(p.getParent());
+        } catch (IOException e) {
+            System.out.println("Cannot create data directory: " + e.getMessage());
+        }
+
+        createDataFile(dataFile);
+        ArrayList<Task> outList = makeOutList(dataFile);
         while (true) {
             if (!scanner.hasNextLine()) {
                 break;
             }
             String line = scanner.nextLine();
             Command c = Command.fromLine(line);
+            String newLine = "";
+
             try {
                 switch (c) {
                     case BYE -> {
@@ -49,8 +72,12 @@ public class darren_bot {
                         return;
                     }
                     case LIST -> {
-                        for (int i = 0; i < outList.size(); i++) {
-                            System.out.println(i + ". " + outList.get(i)); // keep your 0-based display
+                        if (outList.size() == 0) {
+                            System.out.println("Oops the list is empty!");
+                        } else {
+                            for (int i = 0; i < outList.size(); i++) {
+                                System.out.println(i + ". " + outList.get(i)); // keep your 0-based display
+                            }
                         }
                     }
                     case MARK -> {
@@ -59,6 +86,7 @@ public class darren_bot {
                             int second = Integer.parseInt(value[1]);
                             Task currTask = outList.get(second);
                             currTask.isDone = true;
+                            markWrite(dataFile, second, true);
                             System.out.println("Nice! I've marked this task as done: " + currTask);
                         } catch (IndexOutOfBoundsException e) {
                             throw new EmptyTaskException("mark");
@@ -70,6 +98,7 @@ public class darren_bot {
                             int second = Integer.parseInt(value[1]);
                             Task currTask = outList.get(second);
                             currTask.isDone = false;
+                            markWrite(dataFile, second, false);
                             System.out.println("OK, I've marked this task as not done yet:" + currTask);
                         } catch (IndexOutOfBoundsException e) {
                             throw new EmptyTaskException("unmark");
@@ -82,6 +111,7 @@ public class darren_bot {
                             String description = line.substring(9, byIndex);
                             Deadline newDeadline = new Deadline(description, deadline);
                             outList.add(newDeadline);
+                            newLine = "deadline | 0 | " + description + " | " + deadline;
                             System.out.println("Got it. I've added this task:\n" +
                                     newDeadline + "\n" +
                                     "Now you have " + outList.size() + " tasks in the list");
@@ -99,6 +129,7 @@ public class darren_bot {
                             String description = line.substring(6, fromIndex);
                             Event newEvent = new Event(description, from, to);
                             outList.add(newEvent);
+                            newLine = "event | 0 | " + description + " | " + from + " | " + to;
                             System.out.println("Got it. I've added this task:\n" +
                                     newEvent + "\n" +
                                     "Now you have " + outList.size() + " tasks in the list");
@@ -111,6 +142,7 @@ public class darren_bot {
                             String description = line.substring(5);
                             Todo newTodo = new Todo(description);
                             outList.add(newTodo);
+                            newLine = "todo | 0 | " + description;
                             System.out.println("Got it. I've added this task:\n" +
                                     newTodo + "\n" +
                                     "Now you have " + outList.size() + " tasks in the list");
@@ -133,12 +165,99 @@ public class darren_bot {
                         throw new UnexpectedCommandException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                     }
                 }
+                try {
+                    if (newLine != null && !newLine.isBlank()) {
+                        Files.writeString(p, newLine + System.lineSeparator(),
+                                StandardCharsets.UTF_8,
+                                StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+                    }
+                } catch (IOException e) {
+                    System.out.println("Cannot write new Line: " + e.getMessage());
+                }
+
             } catch (UnexpectedCommandException | EmptyTaskException e) {
                 System.out.println(e.getMessage());
             }
         }
         scanner.close();
     }
+
+    public static void createDataFile(String filePath) {
+        File dataFile = new File(filePath);
+        try {
+            dataFile.createNewFile();
+        } catch (IOException e) {
+            System.err.println("Error creating file: " + e.getMessage());
+        }
+    }
+
+    public static void markWrite(String filePath, int index, boolean mark) {
+        Path p = Paths.get(filePath);
+
+        try {
+            // Read all lines into a List
+            List<String> lines = Files.readAllLines(p);
+
+            // Change line 3 (index 2)
+            String targetLine = lines.get(index);
+            String[] parts = targetLine.split("\\|");
+            parts[1] = mark ? "1" : "0";
+            String newTarget = String.join(" | ", parts);
+            lines.set(index, newTarget);
+
+            // Write back to the file
+            Files.write(p, lines);
+
+            System.out.println("Line updated successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<Task> makeOutList(String filePath) {
+        ArrayList<Task> tempList = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Split line by '|'
+                String[] parts = line.split("\\|");
+                Command c = Command.fromLine(parts[0]);
+                Task t = null;
+
+                try {
+                    switch (c) {
+                        case TODO -> {
+                            t = new Todo(parts[2]);
+                            t.isDone = (parts[1].strip().equals("1"));
+                        }
+
+                        case DEADLINE -> {
+                            t = new Deadline(parts[2], parts[3]);
+                            t.isDone = (parts[1].strip().equals("1"));
+                        }
+
+                        case EVENT -> {
+                            t = new Event(parts[2], parts[3], parts[4]);
+                            t.isDone = (parts[1].strip().equals("1"));
+                        }
+
+                        case UNKNOWN -> {
+                            throw new UnexpectedCommandException("Tried to initialize an UNKNOWN Task");
+                        }
+                    }
+                    tempList.add(t);
+                } catch (UnexpectedCommandException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        }
+        return tempList;
+    }
+
+
 
     public static class Task {
         protected String description;
