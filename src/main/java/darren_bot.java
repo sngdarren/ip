@@ -1,3 +1,6 @@
+import javafx.fxml.LoadListener;
+
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.io.FileReader;
 import java.nio.file.Path;
@@ -10,6 +13,8 @@ import java.io.BufferedReader;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class darren_bot {
 
@@ -107,7 +112,8 @@ public class darren_bot {
                     case DEADLINE -> {
                         try {
                             int byIndex = line.indexOf("/by ");
-                            String deadline = line.substring(byIndex + 4);
+                            String deadlineString = line.substring(byIndex + 4).strip();
+                            LocalDate deadline = LocalDate.parse(deadlineString);
                             String description = line.substring(9, byIndex);
                             Deadline newDeadline = new Deadline(description, deadline);
                             outList.add(newDeadline);
@@ -118,6 +124,8 @@ public class darren_bot {
 
                         } catch (IndexOutOfBoundsException e) {
                             throw new EmptyTaskException("deadline");
+                        } catch (DateTimeParseException e) {
+                            System.out.println("Deadline should be in the format '/by yyyy-mm-dd'");
                         }
                     }
                     case EVENT -> {
@@ -233,7 +241,8 @@ public class darren_bot {
                         }
 
                         case DEADLINE -> {
-                            t = new Deadline(parts[2], parts[3]);
+                            LocalDate deadline = LocalDate.parse(parts[3].strip());
+                            t = new Deadline(parts[2], deadline);
                             t.isDone = (parts[1].strip().equals("1"));
                         }
 
@@ -293,9 +302,9 @@ public class darren_bot {
     }
 
     public static class Deadline extends Task {
-        String deadline;
+        LocalDate deadline;
         String taskType;
-        public Deadline(String description, String deadline) {
+        public Deadline(String description, LocalDate deadline) {
             super(description);
             this.deadline = deadline;
             this.taskType = "deadline";
@@ -303,7 +312,8 @@ public class darren_bot {
 
         @Override
         public String toString() {
-            return "[D]" + super.toString() + " (by: " + this.deadline + ")";
+            return "[D]" + super.toString() + " (by: " +
+                    this.deadline.format(DateTimeFormatter.ofPattern("MMM d yyyy")) + ")";
         }
     }
 
