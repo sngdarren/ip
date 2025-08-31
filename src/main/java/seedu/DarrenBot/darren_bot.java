@@ -13,13 +13,44 @@ import seedu.DarrenBot.ui.Ui;
 
 import java.io.IOException;
 
+/**
+ * Entry point of the darren_bot application.
+ * <p>
+ * This class coordinates the overall workflow of the program by:
+ * <ul>
+ *   <li>Initializing the {@link Ui}, {@link Storage}, and {@link TaskList} components.</li>
+ *   <li>Reading user input from the console.</li>
+ *   <li>Parsing the input into commands using {@link Parser}.</li>
+ *   <li>Executing the corresponding task operations (add, list, delete, mark/unmark, etc.).</li>
+ *   <li>Persisting changes to the storage file.</li>
+ * </ul>
+ * </p>
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ * $ java seedu.DarrenBot.darren_bot
+ * Hello! I'm darren_bot
+ * What can I do for you?
+ * </pre>
+ */
 public class darren_bot {
 
+    /** Default file path where tasks are stored persistently. */
     public static final String FILE_PATH = "data/duke.txt";
 
+    /**
+     * Enum representing supported commands in the application.
+     * Used for simple command parsing.
+     */
     enum Command {
         BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, UNKNOWN;
 
+        /**
+         * Parses a raw input line and returns the corresponding command type.
+         *
+         * @param line the input line from the user
+         * @return the parsed {@code Command}, or {@link #UNKNOWN} if no match
+         */
         static Command fromLine(String line) {
             if (line == null || line.isBlank()) {
                 return UNKNOWN;
@@ -39,6 +70,16 @@ public class darren_bot {
         }
     }
 
+    /**
+     * The main entry point of the program.
+     * <p>
+     * Starts the user interface, loads existing tasks from storage,
+     * then enters the main loop to continuously accept and process commands
+     * until the {@code bye} command is entered or input ends.
+     * </p>
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
         Ui ui = new Ui();
         Storage storage = new Storage(FILE_PATH);
