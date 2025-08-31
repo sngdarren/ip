@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-<<<<<<< HEAD:src/main/java/seedu/DarrenBot/darren_bot.java
 /**
  * Entry point of the darren_bot application.
  * <p>
@@ -36,10 +35,9 @@ import java.util.Arrays;
  * What can I do for you?
  * </pre>
  */
-public class darren_bot {
-=======
+
 public class DarrenBot {
->>>>>>> branch-A-CodingStandard:src/main/java/seedu/darrenbot/DarrenBot.java
+
 
     /** Default file path where tasks are stored persistently. */
     public static final String FILE_PATH = "data/duke.txt";
