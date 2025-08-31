@@ -12,13 +12,15 @@ import seedu.darrenbot.parser.Parser;
 import seedu.darrenbot.ui.Ui;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DarrenBot {
 
     public static final String FILE_PATH = "data/duke.txt";
 
     enum Command {
-        BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, UNKNOWN;
+        BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, FIND, UNKNOWN;
 
         static Command fromLine(String line) {
             if (line == null || line.isBlank()) {
@@ -34,6 +36,7 @@ public class DarrenBot {
                 case "todo" -> TODO;
                 case "event" -> EVENT;
                 case "delete" -> DELETE;
+                case "find" -> FIND;
                 default -> UNKNOWN;
             };
         }
@@ -112,6 +115,22 @@ public class DarrenBot {
                         tasks.add(e);
                         storage.appendLine("event | 0 | " + a.desc + " | " + a.from + " | " + a.to);
                         ui.showAdded(e, tasks.size());
+                    }
+                    case FIND -> {
+                        Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
+                        TaskList foundTask = new TaskList(new ArrayList<Task>());
+                        for (Task t : tasks.all()) {
+                            String[] keywords = t.toString().trim().split("\\s+");
+                            if (Arrays.asList(keywords).contains(a.findKeyword.strip())) {
+                                foundTask.add(t);
+                            }
+                        }
+                        if (foundTask.size() != 0) {
+                            ui.showList(foundTask.all());
+                        } else {
+                            System.out.println("Cant find matching keywords");
+                        }
+
                     }
                     default -> throw new UnexpectedCommandException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }

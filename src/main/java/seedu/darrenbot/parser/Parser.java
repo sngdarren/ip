@@ -19,6 +19,7 @@ public class Parser {
             case "todo" -> Command.TODO;
             case "event" -> Command.EVENT;
             case "delete" -> Command.DELETE;
+            case "find" -> Command.FIND;
             default -> Command.UNKNOWN;
         };
     }
@@ -56,6 +57,12 @@ public class Parser {
                     if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) throw new EmptyTaskException("event");
                     yield ParsedArgs.event(desc, from, to);
                 }
+                case FIND -> {
+                    String kw = line.substring(5).trim(); // after "find "
+                    if (kw.isEmpty()) throw new EmptyTaskException("find");
+                    yield ParsedArgs.find(kw);
+                }
+
                 default -> ParsedArgs.none();
             };
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
@@ -71,7 +78,7 @@ public class Parser {
         }
     }
 
-    public enum Command { BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, UNKNOWN }
+    public enum Command { BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, FIND, UNKNOWN }
 
     /** Small POJO for parsed params. */
     public static class ParsedArgs {
@@ -80,11 +87,14 @@ public class Parser {
         public java.time.LocalDate by;
         public String from;
         public String to;
+        public String findKeyword;
 
         public static ParsedArgs none() { return new ParsedArgs(); }
         public static ParsedArgs index(int i) { ParsedArgs a = new ParsedArgs(); a.index = i; return a; }
         public static ParsedArgs todo(String d) { ParsedArgs a = new ParsedArgs(); a.desc = d; return a; }
         public static ParsedArgs deadline(String d, java.time.LocalDate by) { ParsedArgs a = new ParsedArgs(); a.desc = d; a.by = by; return a; }
         public static ParsedArgs event(String d, String from, String to) { ParsedArgs a = new ParsedArgs(); a.desc = d; a.from = from; a.to = to; return a; }
+        public static ParsedArgs find(String keyword) { ParsedArgs a = new ParsedArgs(); a.findKeyword = keyword; return a; }
+
     }
 }
