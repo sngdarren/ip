@@ -1,3 +1,6 @@
-todo  | 1 |  sleep now
-todo | 0 | sleep
-deadline | 0 | sleep  | 2019-12-01
+todo | 1 | sleep now
+todo | 1 | sleep
+deadline | 0 | sleep | 2019-12-01
+todo | 0 | sleep nowss
+deadline | 0 | do work | 2019-11-01
+event | 0 | sleeping beauty | now | never
