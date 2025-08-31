@@ -28,7 +28,7 @@ test {
 }
 
 application {
-    mainClass.set("seedu.DarrenBot.darren_bot")
+    mainClass.set("seedu.darrenbot.DarrenBot")
 }
 
 shadowJar {

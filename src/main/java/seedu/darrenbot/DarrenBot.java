@@ -1,18 +1,21 @@
-package seedu.DarrenBot;
+package seedu.darrenbot;
 
-import seedu.DarrenBot.tasks.Task;
-import seedu.DarrenBot.tasks.Deadline;
-import seedu.DarrenBot.tasks.Event;
-import seedu.DarrenBot.tasks.Todo;
-import seedu.DarrenBot.tasks.TaskList;
-import seedu.DarrenBot.exception.EmptyTaskException;
-import seedu.DarrenBot.exception.UnexpectedCommandException;
-import seedu.DarrenBot.storage.Storage;
-import seedu.DarrenBot.parser.Parser;
-import seedu.DarrenBot.ui.Ui;
+import seedu.darrenbot.tasks.Task;
+import seedu.darrenbot.tasks.Deadline;
+import seedu.darrenbot.tasks.Event;
+import seedu.darrenbot.tasks.Todo;
+import seedu.darrenbot.tasks.TaskList;
+import seedu.darrenbot.exception.EmptyTaskException;
+import seedu.darrenbot.exception.UnexpectedCommandException;
+import seedu.darrenbot.storage.Storage;
+import seedu.darrenbot.parser.Parser;
+import seedu.darrenbot.ui.Ui;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
+<<<<<<< HEAD:src/main/java/seedu/DarrenBot/darren_bot.java
 /**
  * Entry point of the darren_bot application.
  * <p>
@@ -34,6 +37,9 @@ import java.io.IOException;
  * </pre>
  */
 public class darren_bot {
+=======
+public class DarrenBot {
+>>>>>>> branch-A-CodingStandard:src/main/java/seedu/darrenbot/DarrenBot.java
 
     /** Default file path where tasks are stored persistently. */
     public static final String FILE_PATH = "data/duke.txt";
@@ -43,7 +49,7 @@ public class darren_bot {
      * Used for simple command parsing.
      */
     enum Command {
-        BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, UNKNOWN;
+        BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, FIND, UNKNOWN;
 
         /**
          * Parses a raw input line and returns the corresponding command type.
@@ -65,6 +71,7 @@ public class darren_bot {
                 case "todo" -> TODO;
                 case "event" -> EVENT;
                 case "delete" -> DELETE;
+                case "find" -> FIND;
                 default -> UNKNOWN;
             };
         }
@@ -153,6 +160,22 @@ public class darren_bot {
                         tasks.add(e);
                         storage.appendLine("event | 0 | " + a.desc + " | " + a.from + " | " + a.to);
                         ui.showAdded(e, tasks.size());
+                    }
+                    case FIND -> {
+                        Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
+                        TaskList foundTask = new TaskList(new ArrayList<Task>());
+                        for (Task t : tasks.all()) {
+                            String[] keywords = t.toString().trim().split("\\s+");
+                            if (Arrays.asList(keywords).contains(a.findKeyword.strip())) {
+                                foundTask.add(t);
+                            }
+                        }
+                        if (foundTask.size() != 0) {
+                            ui.showList(foundTask.all());
+                        } else {
+                            System.out.println("Cant find matching keywords");
+                        }
+
                     }
                     default -> throw new UnexpectedCommandException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }

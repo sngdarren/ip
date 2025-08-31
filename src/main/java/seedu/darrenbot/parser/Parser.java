@@ -1,6 +1,6 @@
-package seedu.DarrenBot.parser;
+package seedu.darrenbot.parser;
 
-import seedu.DarrenBot.exception.EmptyTaskException;
+import seedu.darrenbot.exception.EmptyTaskException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -45,6 +45,7 @@ public class Parser {
             case "todo" -> Command.TODO;
             case "event" -> Command.EVENT;
             case "delete" -> Command.DELETE;
+            case "find" -> Command.FIND;
             default -> Command.UNKNOWN;
         };
     }
@@ -99,6 +100,12 @@ public class Parser {
                     if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) throw new EmptyTaskException("event");
                     yield ParsedArgs.event(desc, from, to);
                 }
+                case FIND -> {
+                    String kw = line.substring(5).trim(); // after "find "
+                    if (kw.isEmpty()) throw new EmptyTaskException("find");
+                    yield ParsedArgs.find(kw);
+                }
+
                 default -> ParsedArgs.none();
             };
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
@@ -114,10 +121,8 @@ public class Parser {
         }
     }
 
-    /**
-     * Enum representing all commands recognized by the parser.
-     */
-    public enum Command { BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, UNKNOWN }
+    public enum Command { BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, FIND, UNKNOWN }
+
 
     /**
      * Container class for arguments extracted from user input.
@@ -137,6 +142,7 @@ public class Parser {
         public String from;
         /** End time string, used for event. */
         public String to;
+        public String findKeyword;
 
         /** Creates an empty {@link ParsedArgs} object. */
         public static ParsedArgs none() { return new ParsedArgs(); }
@@ -152,5 +158,7 @@ public class Parser {
 
         /** Creates {@link ParsedArgs} for an event with description and time range. */
         public static ParsedArgs event(String d, String from, String to) { ParsedArgs a = new ParsedArgs(); a.desc = d; a.from = from; a.to = to; return a; }
+        public static ParsedArgs find(String keyword) { ParsedArgs a = new ParsedArgs(); a.findKeyword = keyword; return a; }
+
     }
 }

@@ -1,8 +1,8 @@
-package seedu.DarrenBot.ui;
+package seedu.darrenbot.ui;
 
 import java.util.List;
 import java.util.Scanner;
-import seedu.DarrenBot.tasks.Task;
+import seedu.darrenbot.tasks.Task;
 
 /**
  * Handles all interactions with the user through the command line interface.

@@ -1,4 +1,4 @@
-package seedu.DarrenBot.exception;
+package seedu.darrenbot.exception;
 
 
 /**

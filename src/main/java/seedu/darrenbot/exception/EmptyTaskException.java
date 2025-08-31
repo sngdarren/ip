@@ -1,4 +1,4 @@
-package seedu.DarrenBot.exception;
+package seedu.darrenbot.exception;
 
 /**
  * Exception thrown when a task is created without a valid description.
