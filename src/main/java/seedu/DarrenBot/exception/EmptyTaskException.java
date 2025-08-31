@@ -1,4 +1,4 @@
-package DarrenBot.exception;
+package seedu.DarrenBot.exception;
 
 public class EmptyTaskException extends Exception {
     public EmptyTaskException(String taskType) {

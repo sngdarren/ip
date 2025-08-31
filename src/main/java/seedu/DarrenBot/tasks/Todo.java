@@ -1,4 +1,4 @@
-package DarrenBot.tasks;
+package seedu.DarrenBot.tasks;
 
 public class Todo extends Task {
     String taskType;

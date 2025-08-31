@@ -1,8 +1,8 @@
-package DarrenBot.ui;
+package seedu.DarrenBot.ui;
 
 import java.util.List;
 import java.util.Scanner;
-import DarrenBot.tasks.Task;
+import seedu.DarrenBot.tasks.Task;
 
 public class Ui {
     private final Scanner scanner = new Scanner(System.in);

@@ -1,4 +1,4 @@
-package DarrenBot.exception;
+package seedu.DarrenBot.exception;
 
 public class UnexpectedCommandException extends Exception {
     public UnexpectedCommandException(String message) {

@@ -1,15 +1,15 @@
-import javafx.fxml.LoadListener;
+package seedu.DarrenBot;
 
-import DarrenBot.tasks.Task;
-import DarrenBot.tasks.Deadline;
-import DarrenBot.tasks.Event;
-import DarrenBot.tasks.Todo;
-import DarrenBot.tasks.TaskList;
-import DarrenBot.exception.EmptyTaskException;
-import DarrenBot.exception.UnexpectedCommandException;
-import DarrenBot.storage.Storage;
-import DarrenBot.parser.Parser;
-import DarrenBot.ui.Ui;
+import seedu.DarrenBot.tasks.Task;
+import seedu.DarrenBot.tasks.Deadline;
+import seedu.DarrenBot.tasks.Event;
+import seedu.DarrenBot.tasks.Todo;
+import seedu.DarrenBot.tasks.TaskList;
+import seedu.DarrenBot.exception.EmptyTaskException;
+import seedu.DarrenBot.exception.UnexpectedCommandException;
+import seedu.DarrenBot.storage.Storage;
+import seedu.DarrenBot.parser.Parser;
+import seedu.DarrenBot.ui.Ui;
 
 import java.io.IOException;
 

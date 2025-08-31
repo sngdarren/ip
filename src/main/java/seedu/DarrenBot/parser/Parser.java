@@ -1,6 +1,6 @@
-package DarrenBot.parser;
+package seedu.DarrenBot.parser;
 
-import DarrenBot.exception.EmptyTaskException;
+import seedu.DarrenBot.exception.EmptyTaskException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;

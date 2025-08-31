@@ -1,11 +1,11 @@
-package DarrenBot.storage;
+package seedu.DarrenBot.storage;
 
-import DarrenBot.tasks.Task;
-import DarrenBot.tasks.Todo;
-import DarrenBot.tasks.Event;
-import DarrenBot.tasks.Deadline;
-import DarrenBot.tasks.TaskList;
-import DarrenBot.exception.UnexpectedCommandException;
+import seedu.DarrenBot.tasks.Task;
+import seedu.DarrenBot.tasks.Todo;
+import seedu.DarrenBot.tasks.Event;
+import seedu.DarrenBot.tasks.Deadline;
+import seedu.DarrenBot.tasks.TaskList;
+import seedu.DarrenBot.exception.UnexpectedCommandException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
