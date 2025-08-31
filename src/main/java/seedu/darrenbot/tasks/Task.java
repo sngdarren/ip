@@ -1,4 +1,4 @@
-package seedu.DarrenBot.tasks;
+package seedu.darrenbot.tasks;
 
 public class Task {
     protected String description;

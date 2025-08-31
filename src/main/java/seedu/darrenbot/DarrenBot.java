@@ -1,19 +1,19 @@
-package seedu.DarrenBot;
+package seedu.darrenbot;
 
-import seedu.DarrenBot.tasks.Task;
-import seedu.DarrenBot.tasks.Deadline;
-import seedu.DarrenBot.tasks.Event;
-import seedu.DarrenBot.tasks.Todo;
-import seedu.DarrenBot.tasks.TaskList;
-import seedu.DarrenBot.exception.EmptyTaskException;
-import seedu.DarrenBot.exception.UnexpectedCommandException;
-import seedu.DarrenBot.storage.Storage;
-import seedu.DarrenBot.parser.Parser;
-import seedu.DarrenBot.ui.Ui;
+import seedu.darrenbot.tasks.Task;
+import seedu.darrenbot.tasks.Deadline;
+import seedu.darrenbot.tasks.Event;
+import seedu.darrenbot.tasks.Todo;
+import seedu.darrenbot.tasks.TaskList;
+import seedu.darrenbot.exception.EmptyTaskException;
+import seedu.darrenbot.exception.UnexpectedCommandException;
+import seedu.darrenbot.storage.Storage;
+import seedu.darrenbot.parser.Parser;
+import seedu.darrenbot.ui.Ui;
 
 import java.io.IOException;
 
-public class darren_bot {
+public class DarrenBot {
 
     public static final String FILE_PATH = "data/duke.txt";
 

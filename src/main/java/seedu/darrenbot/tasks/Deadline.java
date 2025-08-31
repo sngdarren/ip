@@ -1,4 +1,4 @@
-package seedu.DarrenBot.tasks;
+package seedu.darrenbot.tasks;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

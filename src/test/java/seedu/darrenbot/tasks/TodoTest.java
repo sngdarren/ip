@@ -1,4 +1,4 @@
-package seedu.DarrenBot.tasks;
+package seedu.darrenbot.tasks;
 
 import org.junit.jupiter.api.Test;
 
