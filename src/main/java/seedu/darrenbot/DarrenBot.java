@@ -191,4 +191,8 @@ public class DarrenBot {
         ui.close();
     }
 
+    public String getResponse(String input) {
+        return "DarrenBot heard: " + input;
+    }
+
 }

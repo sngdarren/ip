@@ -62,11 +62,24 @@ public class Ui {
      *
      * @param tasks the list of tasks to display
      */
-    public void showList(List<Task> tasks) {
+    public String formatList(List<Task> tasks) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
-            System.out.println(i + ". " + tasks.get(i));
+            sb.append((i + 1)).append(". ").append(tasks.get(i)).append("\n");
         }
+        return sb.toString().trim();
     }
+
+    public void showList(List<Task> tasks) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Here are the tasks in your list:\n");
+        for (int i = 0; i < tasks.size(); i++) {
+            sb.append((i + 1)).append(". ").append(tasks.get(i)).append("\n");
+        }
+        System.out.println((sb));
+    }
+
 
     /**
      * Displays a confirmation message when a task is added.

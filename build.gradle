@@ -52,8 +52,13 @@ test {
 //    mainClass.set("seedu.darrenbot.DarrenBot")
 //}
 application {
+<<<<<<< Updated upstream
     mainClass = "seedu.darrenbot.launcher.Launcher"
+=======
+    mainClass.set("seedu.darrenbot.gui.Launcher")
+>>>>>>> Stashed changes
 }
+
 
 shadowJar {
     archiveBaseName = "duke"
