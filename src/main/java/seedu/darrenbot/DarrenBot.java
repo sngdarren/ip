@@ -1,19 +1,19 @@
 package seedu.darrenbot;
 
-import seedu.darrenbot.tasks.Task;
-import seedu.darrenbot.tasks.Deadline;
-import seedu.darrenbot.tasks.Event;
-import seedu.darrenbot.tasks.Todo;
-import seedu.darrenbot.tasks.TaskList;
-import seedu.darrenbot.exception.EmptyTaskException;
-import seedu.darrenbot.exception.UnexpectedCommandException;
-import seedu.darrenbot.storage.Storage;
-import seedu.darrenbot.parser.Parser;
-import seedu.darrenbot.ui.Ui;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import seedu.darrenbot.exception.EmptyTaskException;
+import seedu.darrenbot.exception.UnexpectedCommandException;
+import seedu.darrenbot.parser.Parser;
+import seedu.darrenbot.storage.Storage;
+import seedu.darrenbot.tasks.Deadline;
+import seedu.darrenbot.tasks.Event;
+import seedu.darrenbot.tasks.Task;
+import seedu.darrenbot.tasks.TaskList;
+import seedu.darrenbot.tasks.Todo;
+import seedu.darrenbot.ui.Ui;
 
 /**
  * Entry point of the darren_bot application.
@@ -118,8 +118,7 @@ public class DarrenBot {
                 case LIST -> {
                     if (tasks.size() == 0) {
                         ui.showEmptyList();
-                    }
-                    else {
+                    } else {
                         ui.showList(tasks.all());
                     }
                 }
@@ -185,16 +184,13 @@ public class DarrenBot {
                     throw new UnexpectedCommandException("OOPS!!! I'm sorry, but I don't know what that means :-(");
                 }
                 default -> {
-                    assert false : "This should never be reached because UNKOWN already handles it";
+                    assert false : "This should never be reached because UNKNOWN already handles it";
                 }
                 }
-            } catch (EmptyTaskException e) {
+            } catch (EmptyTaskException | UnexpectedCommandException e) {
                 ui.showError(e.getMessage());
-            }
-            catch (IndexOutOfBoundsException e) {
+            } catch (IndexOutOfBoundsException e) {
                 ui.showError("OOPS!!! Index out of bounds.");
-            } catch (UnexpectedCommandException e) {
-                ui.showError(e.getMessage());
             } catch (IOException e) {
                 ui.showError("Cannot write to data file: " + e.getMessage());
             }

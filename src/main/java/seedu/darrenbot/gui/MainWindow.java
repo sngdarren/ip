@@ -7,10 +7,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-/**
- * Controller for the main GUI.
- */
+
 public class MainWindow extends AnchorPane {
+    /**
+     * Controller for the main GUI.
+     */
+    public static final String userImagePath = "/images/gloria.jpg";
+    public static final String dukeImagePath = "/images/motomoto.jpg";
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -22,8 +25,8 @@ public class MainWindow extends AnchorPane {
 
     private DarrenBot darrenBot;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/gloria.jpg"));
-    private Image dukeImage = new Image(this.getClass().getResourceAsStream("/images/motomoto.jpg"));
+    private Image userImage = new Image(this.getClass().getResourceAsStream(userImagePath));
+    private Image dukeImage = new Image(this.getClass().getResourceAsStream(dukeImagePath));
 
     @FXML
     public void initialize() {

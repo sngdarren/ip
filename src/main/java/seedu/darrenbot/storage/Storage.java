@@ -18,9 +18,6 @@ import seedu.darrenbot.tasks.Task;
 import seedu.darrenbot.tasks.TaskList;
 import seedu.darrenbot.tasks.Todo;
 
-
-
-
 /**
  * Handles reading from and writing to the storage file that persists user tasks.
  * <p>
