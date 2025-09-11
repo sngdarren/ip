@@ -120,9 +120,9 @@ public class DarrenBot {
             }
             case TODO -> {
                 Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Todo todo = new Todo(a.desc);
+                Todo todo = new Todo(a.getDesc());
                 tasks.add(todo);
-                storage.appendLine("todo | 0 | " + a.desc);
+                storage.appendLine("todo | 0 | " + a.getDesc());
                 return "Added todo: " + todo;
             }
             case MARK -> {
@@ -152,9 +152,9 @@ public class DarrenBot {
 
             case DEADLINE -> {
                 Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Deadline d = new Deadline(a.desc, a.by);
+                Deadline d = new Deadline(a.getDesc(), a.getBy());
                 tasks.add(d);
-                storage.appendLine("deadline | 0 | " + a.desc + " | " + a.by);
+                storage.appendLine("deadline | 0 | " + a.getDesc() + " | " + a.getBy());
                 final String s = "Got it. I’ve added this task:\n  " + d
                         + "\n Now you have " + tasks.size() + " tasks in the list.";
                 return s;
@@ -162,9 +162,9 @@ public class DarrenBot {
 
             case EVENT -> {
                 Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Event e = new Event(a.desc, a.from, a.to);
+                Event e = new Event(a.getDesc(), a.getFrom(), a.getTo());
                 tasks.add(e);
-                storage.appendLine("event | 0 | " + a.desc + " | " + a.from + " | " + a.to);
+                storage.appendLine("event | 0 | " + a.getDesc() + " | " + a.getFrom() + " | " + a.getTo());
                 return "Got it. I’ve added this task:\n  " + e
                         + "\nNow you have " + tasks.size() + " tasks in the list.";
             }

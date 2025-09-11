@@ -1,8 +1,7 @@
 package seedu.darrenbot.launcher;
 
-import seedu.darrenbot.main.Main;
-
 import javafx.application.Application;
+import seedu.darrenbot.main.Main;
 
 /**
  * Try to make launcher Class
