@@ -94,11 +94,13 @@ public class TaskList {
 
         for (Task t : tasks) {
             if (t instanceof Todo todo) {
-                lines.add(todo.taskType + " | " + (t.isDone ? "1" : "0") + " | " + todo.description);
+                lines.add(todo.getTaskType() + " | " + (t.isDone ? "1" : "0") + " | " + todo.description);
             } else if (t instanceof Deadline dl) {
-                lines.add(dl.taskType + " | " + (t.isDone ? "1" : "0") + " | " + dl.description + " | " + dl.deadline.format(fmt));
+                lines.add(dl.getTaskType() + " | " + (t.isDone ? "1" : "0") + " | " + dl.description + " | "
+                        + dl.getDeadline().format(fmt));
             } else if (t instanceof Event ev) {
-                lines.add(ev.taskType + " | " + (t.isDone ? "1" : "0") + " | " + ev.description + " | " + ev.from + " | " + ev.to);
+                lines.add(ev.getTaskType() + " | " + (t.isDone ? "1" : "0") + " | " + ev.description + " | "
+                        + ev.getFrom() + " | " + ev.getTo());
             }
         }
         return lines;

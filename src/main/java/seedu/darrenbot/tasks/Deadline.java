@@ -18,9 +18,10 @@ import java.time.format.DateTimeFormatter;
  * // Output: [D][ ] submit report (by: Sep 1 2025)
  * </pre>
  */
+@SuppressWarnings("checkstyle:Regexp")
 public class Deadline extends Task {
-    LocalDate deadline;
-    String taskType;
+    private LocalDate deadline;
+    private String taskType;
 
     /**
      * Constructs a {@code Deadline} with the given description and due date.
@@ -32,6 +33,14 @@ public class Deadline extends Task {
         super(description);
         this.deadline = deadline;
         this.taskType = "deadline";
+    }
+
+    public String getTaskType() {
+        return this.taskType;
+    }
+
+    public LocalDate getDeadline() {
+        return this.deadline;
     }
 
     /**
@@ -49,7 +58,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " +
-                this.deadline.format(DateTimeFormatter.ofPattern("MMM d yyyy")) + ")";
+        return "[D]" + super.toString() + " (by: "
+                + this.deadline.format(DateTimeFormatter.ofPattern("MMM d yyyy")) + ")";
     }
 }

@@ -1,12 +1,5 @@
 package seedu.darrenbot.storage;
 
-import seedu.darrenbot.tasks.Task;
-import seedu.darrenbot.tasks.Todo;
-import seedu.darrenbot.tasks.Event;
-import seedu.darrenbot.tasks.Deadline;
-import seedu.darrenbot.tasks.TaskList;
-import seedu.darrenbot.exception.UnexpectedCommandException;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +10,16 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import seedu.darrenbot.exception.UnexpectedCommandException;
+import seedu.darrenbot.tasks.Deadline;
+import seedu.darrenbot.tasks.Event;
+import seedu.darrenbot.tasks.Task;
+import seedu.darrenbot.tasks.TaskList;
+import seedu.darrenbot.tasks.Todo;
+
+
+
 
 /**
  * Handles reading from and writing to the storage file that persists user tasks.
@@ -81,7 +84,9 @@ public class Storage {
      */
     public TaskList load() throws IOException, UnexpectedCommandException {
         ArrayList<Task> tasks = new ArrayList<>();
-        if (!Files.exists(this.path)) return new TaskList(tasks);
+        if (!Files.exists(this.path)) {
+            return new TaskList(tasks);
+        }
 
         try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String line;
@@ -92,35 +97,35 @@ public class Storage {
                 boolean isDone = parts.length > 1 && parts[1].trim().equals("1");
 
                 switch (type) {
-                    case "todo" -> {
-                        Todo t = new Todo(parts[2].trim());
-                        if (isDone) {
-                            t.redo();
-                        } else {
-                            t.undo();
-                        }
-                        tasks.add(t);
+                case "todo" -> {
+                    Todo t = new Todo(parts[2].trim());
+                    if (isDone) {
+                        t.redo();
+                    } else {
+                        t.undo();
                     }
-                    case "deadline" -> {
-                        LocalDate by = LocalDate.parse(parts[3].trim());
-                        Deadline d = new Deadline(parts[2].trim(), by);
-                        if (isDone) {
-                            d.redo();
-                        } else {
-                            d.undo();
-                        }
-                        tasks.add(d);
+                    tasks.add(t);
+                }
+                case "deadline" -> {
+                    LocalDate by = LocalDate.parse(parts[3].trim());
+                    Deadline d = new Deadline(parts[2].trim(), by);
+                    if (isDone) {
+                        d.redo();
+                    } else {
+                        d.undo();
                     }
-                    case "event" -> {
-                        Event e = new Event(parts[2].trim(), parts[3].trim(), parts[4].trim());
-                        if (isDone) {
-                            e.redo();
-                        } else {
-                            e.undo();
-                        }
-                        tasks.add(e);
+                    tasks.add(d);
+                }
+                case "event" -> {
+                    Event e = new Event(parts[2].trim(), parts[3].trim(), parts[4].trim());
+                    if (isDone) {
+                        e.redo();
+                    } else {
+                        e.undo();
                     }
-                    default -> throw new UnexpectedCommandException("Tried to initialize an UNKNOWN Task");
+                    tasks.add(e);
+                }
+                default -> throw new UnexpectedCommandException("Tried to initialize an UNKNOWN Task");
                 }
             }
         }

@@ -127,7 +127,7 @@ public class DarrenBot {
             }
             case MARK -> {
                 Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Task t = tasks.get(a.index);
+                Task t = tasks.get(a.getIndex());
                 t.redo();
                 storage.rewrite(tasks);
                 return "Nice! I’ve marked this task as done:\n  " + t;
@@ -135,7 +135,7 @@ public class DarrenBot {
 
             case UNMARK -> {
                 Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Task t = tasks.get(a.index);
+                Task t = tasks.get(a.getIndex());
                 t.undo();
                 storage.rewrite(tasks);
                 return "OK, I’ve marked this task as not done yet:\n  " + t;
@@ -143,7 +143,7 @@ public class DarrenBot {
 
             case DELETE -> {
                 Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Task removed = tasks.remove(a.index);
+                Task removed = tasks.remove(a.getIndex());
                 storage.rewrite(tasks);
                 final String s = "Noted. I’ve removed this task:\n  " + removed
                         + "\nNow you have " + tasks.size() + " tasks in the list.";
@@ -174,7 +174,7 @@ public class DarrenBot {
                 TaskList found = new TaskList(new java.util.ArrayList<>());
                 for (Task t : tasks.all()) {
                     // simple contains; refine as needed
-                    if (t.toString().toLowerCase().contains(a.findKeyword.toLowerCase().trim())) {
+                    if (t.toString().toLowerCase().contains(a.getFindKeyword().toLowerCase().trim())) {
                         found.add(t);
                     }
                 }

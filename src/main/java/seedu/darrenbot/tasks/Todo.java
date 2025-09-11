@@ -15,7 +15,7 @@ package seedu.darrenbot.tasks;
  * </pre>
  */
 public class Todo extends Task {
-    String taskType;
+    private String taskType;
 
     /**
      * Constructs a {@code Todo} task with the given description.
@@ -25,6 +25,10 @@ public class Todo extends Task {
     public Todo(String description) {
         super(description);
         this.taskType = "todo";
+    }
+
+    public String getTaskType() {
+        return this.taskType;
     }
 
     /**

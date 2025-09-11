@@ -5,3 +5,4 @@ todo | 1 | sleep nownownow
 event | 0 | now | now | forever
 deadline | 0 | i dont want do work | 2025-01-01
 todo | 0 | now
+todo | 0 | now
