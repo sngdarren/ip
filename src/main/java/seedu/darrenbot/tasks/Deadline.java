@@ -18,10 +18,10 @@ import java.time.format.DateTimeFormatter;
  * // Output: [D][ ] submit report (by: Sep 1 2025)
  * </pre>
  */
-@SuppressWarnings("checkstyle:Regexp")
+
 public class Deadline extends Task {
-    private LocalDate deadline;
-    private String taskType;
+    private final LocalDate deadline;
+    private final String taskType;
 
     /**
      * Constructs a {@code Deadline} with the given description and due date.

@@ -156,6 +156,7 @@ public class Storage {
      */
     public void rewrite(TaskList tasks) throws IOException {
         List<String> lines = tasks.asStorageLines();
-        Files.write(this.path, lines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        Files.write(this.path, lines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.CREATE);
     }
 }
