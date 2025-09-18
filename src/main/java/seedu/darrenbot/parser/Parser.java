@@ -73,81 +73,97 @@ public class Parser {
      */
     public static ParsedArgs parseArgs(Command cmd, String line) throws EmptyTaskException, UnexpectedCommandException {
         return switch (cmd) {
-        case MARK, UNMARK, DELETE -> {
-            String[] value = line.split(" ");
-            int idx = Integer.parseInt(value[1]); // 0-based index
-            yield ParsedArgs.index(idx);
-        }
-        case TODO -> {
-            String desc = line.substring(5).trim();
-            if (desc.isEmpty()) {
-                throw new EmptyTaskException("todo must have a description");
-            }
-            yield ParsedArgs.todo(desc);
-        }
-        case DEADLINE -> {
-            LocalDate by;
-            int byIndex = line.indexOf("/by ");
-            if (byIndex < 0) {
-                throw new EmptyTaskException("deadline index must be within list range");
-            }
-            String desc = line.substring(9, byIndex).trim();
-            String deadlineString = line.substring(byIndex + 4).trim();
-            if (desc.isEmpty()) {
-                throw new EmptyTaskException("deadline should be in the format: deadline <desc> /from <yyyy-mm-dd>"
-                        + " /to <yyyy-mm-dd>");
-            }
-
-            try {
-                by = java.time.LocalDate.parse(deadlineString); // ISO yyyy-MM-dd only
-            } catch (java.time.format.DateTimeParseException e) {
-                throw new EmptyTaskException("deadline (date must be yyyy-mm-dd)");
-            }
-
-            yield ParsedArgs.deadline(desc, by);
-        }
-        case EVENT -> {
-            int fromIndex = line.indexOf("/from ");
-            int toIndex = line.indexOf("/to ");
-            if (fromIndex < 0 || toIndex < 0 || toIndex <= fromIndex) {
-                throw new EmptyTaskException("event");
-            }
-            String desc = line.substring(6, fromIndex).trim();
-            String from = line.substring(fromIndex + 6, toIndex).trim();
-            String to = line.substring(toIndex + 4).trim();
-            if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) {
-                throw new EmptyTaskException("event");
-            }
-            yield ParsedArgs.event(desc, from, to);
-        }
-        case FIND -> {
-            String kw = line.substring(5).trim();
-            if (kw.isEmpty()) {
-                throw new EmptyTaskException("find");
-            }
-            yield ParsedArgs.find(kw);
-        }
-
-        case UPDATE -> {
-            String[] value = line.split(" ");
-            int idx;
-            if (value.length != 4) {
-                throw new UnexpectedCommandException("Updates are only for Events, try the format 'update <index> "
-                        + "<from> <to>");
-            }
-            try {
-                idx = Integer.parseInt(value[1]);
-            } catch (NumberFormatException e) {
-                throw new UnexpectedCommandException("Index must be an integer.");
-            }
-            String from = value[2];
-            String to = value[3];
-            yield ParsedArgs.updateEvent(idx, from, to);
-        }
-
+        case MARK, UNMARK, DELETE -> parseIndexOnly(line);
+        case TODO -> parseTodo(line);
+        case DEADLINE -> parseDeadline(line);
+        case EVENT -> parseEvent(line);
+        case FIND -> parseFind(line);
+        case UPDATE -> parseUpdate(line);
         default -> ParsedArgs.none();
         };
     }
+
+    /* -------------------------
+     * Per-command helpers
+     * ------------------------- */
+
+    private static ParsedArgs parseIndexOnly(String line) {
+        String[] value = line.split(" ");
+        int idx = Integer.parseInt(value[1]);
+        return ParsedArgs.index(idx);
+    }
+
+    private static ParsedArgs parseTodo(String line) throws EmptyTaskException {
+        String desc = line.substring(5).trim();
+        if (desc.isEmpty()) {
+            throw new EmptyTaskException("todo");
+        }
+        return ParsedArgs.todo(desc);
+    }
+
+    private static ParsedArgs parseDeadline(String line) throws EmptyTaskException, UnexpectedCommandException {
+        int byIndex = line.indexOf("/by ");
+        if (byIndex < 0) {
+            throw new UnexpectedCommandException("deadline should be in the format: "
+                    + "deadline <desc> /by <yyyy-mm-dd>");
+        }
+        String desc = line.substring(9, byIndex).trim();
+        String deadlineString = line.substring(byIndex + 4).trim();
+        if (desc.isEmpty()) {
+            throw new EmptyTaskException("deadline");
+        }
+
+        java.time.LocalDate by;
+        try {
+            by = java.time.LocalDate.parse(deadlineString);
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new UnexpectedCommandException("deadline (date must be yyyy-mm-dd)");
+        }
+        return ParsedArgs.deadline(desc, by);
+    }
+
+    private static ParsedArgs parseEvent(String line) throws EmptyTaskException, UnexpectedCommandException {
+        int fromIndex = line.indexOf("/from ");
+        int toIndex = line.indexOf("/to ");
+        if (fromIndex < 0 || toIndex < 0 || toIndex <= fromIndex) {
+            throw new UnexpectedCommandException("event should be in the format: "
+                    + "event <desc> /from <from> /to <to>");
+        }
+        String desc = line.substring(6, fromIndex).trim();
+        String from = line.substring(fromIndex + 6, toIndex).trim();
+        String to = line.substring(toIndex + 4).trim();
+        if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) {
+            throw new EmptyTaskException("event");
+        }
+        return ParsedArgs.event(desc, from, to);
+    }
+
+    private static ParsedArgs parseFind(String line) throws EmptyTaskException {
+        String kw = line.substring(5).trim();
+        if (kw.isEmpty()) {
+            throw new EmptyTaskException("find");
+        }
+        return ParsedArgs.find(kw);
+    }
+
+    private static ParsedArgs parseUpdate(String line) throws UnexpectedCommandException {
+        String[] value = line.split(" ");
+        if (value.length != 4) {
+            throw new UnexpectedCommandException(
+                    "Updates are only for Events, try the format 'update <index> <from> <to>"
+            );
+        }
+        final int idx;
+        try {
+            idx = Integer.parseInt(value[1]);
+        } catch (NumberFormatException e) {
+            throw new UnexpectedCommandException("Index must be an integer.");
+        }
+        String from = value[2];
+        String to = value[3];
+        return ParsedArgs.updateEvent(idx, from, to);
+    }
+
 
     /**
      * Represents the set of supported command types that the {@code Parser} can
@@ -166,18 +182,14 @@ public class Parser {
      * </p>
      */
     public static class ParsedArgs {
-        /** Task index, used for mark/unmark/delete commands. */
         private Integer index;
-        /** Task description, used for todo/deadline/event. */
         private String desc;
-        /** Deadline date, used for deadline. */
         private java.time.LocalDate by;
-        /** Start time string, used for event. */
         private String from;
-        /** End time string, used for event. */
         private String to;
         private String findKeyword;
 
+        // --- Getters ---
         public Integer getIndex() {
             return this.index;
         }
@@ -239,7 +251,7 @@ public class Parser {
             return a;
         }
 
-        /** Creates {@link ParsedArgs} for to find a keyword. */
+        /** Creates {@link ParsedArgs} to update an Event */
         public static ParsedArgs updateEvent(Integer index, String from, String to) {
             ParsedArgs a = new ParsedArgs();
             a.index = index;

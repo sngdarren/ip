@@ -88,46 +88,56 @@ public class Storage {
         try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split("\\|");
-                // parts are like: type | 0/1 | desc | (extra...)
-                String type = parts[0].trim().toLowerCase();
-                boolean isDone = parts.length > 1 && parts[1].trim().equals("1");
-
-                switch (type) {
-                case "todo" -> {
-                    Todo t = new Todo(parts[2].trim());
-                    if (isDone) {
-                        t.redo();
-                    } else {
-                        t.undo();
-                    }
-                    tasks.add(t);
-                }
-                case "deadline" -> {
-                    LocalDate by = LocalDate.parse(parts[3].trim());
-                    Deadline d = new Deadline(parts[2].trim(), by);
-                    if (isDone) {
-                        d.redo();
-                    } else {
-                        d.undo();
-                    }
-                    tasks.add(d);
-                }
-                case "event" -> {
-                    Event e = new Event(parts[2].trim(), parts[3].trim(), parts[4].trim());
-                    if (isDone) {
-                        e.redo();
-                    } else {
-                        e.undo();
-                    }
-                    tasks.add(e);
-                }
-                default -> throw new UnexpectedCommandException("Tried to initialize an UNKNOWN Task");
-                }
+                tasks.add(parseStorageLine(line)); // delegate
             }
         }
         return new TaskList(tasks);
     }
+
+    /* =========================
+     * Helpers (single concerns)
+     * ========================= */
+
+    private Task parseStorageLine(String line) throws UnexpectedCommandException {
+        String[] parts = line.split("\\|"); // parts: type | 0/1 | desc | (extras...)
+        String type = parts[0].trim().toLowerCase();
+        boolean isDone = parts.length > 1 && parts[1].trim().equals("1");
+
+        return switch (type) {
+        case "todo" -> buildTodo(parts, isDone);
+        case "deadline" -> buildDeadline(parts, isDone);
+        case "event" -> buildEvent(parts, isDone);
+        default -> throw new UnexpectedCommandException("Tried to initialize an UNKNOWN Task");
+        };
+    }
+
+    private Todo buildTodo(String[] parts, boolean isDone) {
+        Todo t = new Todo(parts[2].trim());
+        applyDoneFlag(t, isDone);
+        return t;
+    }
+
+    private Deadline buildDeadline(String[] parts, boolean isDone) {
+        LocalDate by = LocalDate.parse(parts[3].trim());
+        Deadline d = new Deadline(parts[2].trim(), by);
+        applyDoneFlag(d, isDone);
+        return d;
+    }
+
+    private Event buildEvent(String[] parts, boolean isDone) {
+        Event e = new Event(parts[2].trim(), parts[3].trim(), parts[4].trim());
+        applyDoneFlag(e, isDone);
+        return e;
+    }
+
+    private void applyDoneFlag(Task t, boolean isDone) {
+        if (isDone) {
+            t.redo();
+        } else {
+            t.undo();
+        }
+    }
+
 
     /**
      * Appends a single line representing a task to the storage file.

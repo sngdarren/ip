@@ -100,111 +100,140 @@ public class DarrenBot {
         sc.close();
     }
 
-
     public String getResponse(String line) {
         try {
             Parser.Command cmd = Parser.parseCommand(line);
-            switch (cmd) {
-            case BYE -> {
-                return "Bye. Hope to see you again soon!";
-            }
-            case LIST -> {
-                if (tasks.size() == 0) {
-                    return "Your task list is empty.";
-                }
-                return ui.formatList(tasks.all()); // <-- change ui.showList to a string-returning method
-            }
-            case TODO -> {
-                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Todo todo = new Todo(a.getDesc());
-                tasks.add(todo);
-                storage.appendLine("todo | 0 | " + a.getDesc());
-                return "Added todo: " + todo;
-            }
-            case MARK -> {
-                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Task t = tasks.get(a.getIndex());
-                t.redo();
-                storage.rewrite(tasks);
-                return "Nice! I’ve marked this task as done:\n  " + t;
-            }
-
-            case UNMARK -> {
-                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Task t = tasks.get(a.getIndex());
-                t.undo();
-                storage.rewrite(tasks);
-                return "OK, I’ve marked this task as not done yet:\n  " + t;
-            }
-
-            case DELETE -> {
-                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Task removed = tasks.remove(a.getIndex());
-                storage.rewrite(tasks);
-                final String s = "Noted. I’ve removed this task:\n  " + removed
-                        + "\nNow you have " + tasks.size() + " tasks in the list.";
-                return s;
-            }
-
-            case DEADLINE -> {
-                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Deadline d = new Deadline(a.getDesc(), a.getBy());
-                tasks.add(d);
-                storage.appendLine("deadline | 0 | " + a.getDesc() + " | " + a.getBy());
-                final String s = "Got it. I’ve added this task:\n  " + d
-                        + "\n Now you have " + tasks.size() + " tasks in the list.";
-                return s;
-            }
-
-            case EVENT -> {
-                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Event e = new Event(a.getDesc(), a.getFrom(), a.getTo());
-                tasks.add(e);
-                storage.appendLine("event | 0 | " + a.getDesc() + " | " + a.getFrom() + " | " + a.getTo());
-                return "Got it. I’ve added this task:\n  " + e
-                        + "\nNow you have " + tasks.size() + " tasks in the list.";
-            }
-
-            case FIND -> {
-                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                TaskList found = new TaskList(new java.util.ArrayList<>());
-                for (Task t : tasks.all()) {
-                    // simple contains; refine as needed
-                    if (t.toString().toLowerCase().contains(a.getFindKeyword().toLowerCase().trim())) {
-                        found.add(t);
-                    }
-                }
-                return found.size() == 0
-                        ? "I couldn’t find any matching tasks."
-                        : "Here are the matching tasks in your list:\n" + ui.formatList(found.all());
-            }
-
-            case UPDATE -> {
-                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
-                Task t = tasks.get(a.getIndex());
-                if (!(t instanceof Event)) {
-                    throw new UnexpectedCommandException("Task of index " + a.getIndex() + " is not an Event!");
-                }
-
-                Event e = (Event) t;
-                e.updateEvent(a.getFrom(), a.getTo());
-                storage.rewrite(tasks);
-                return "Updated Event " + a.getIndex() + " successfully!";
-            }
-            // … same pattern for DEADLINE, EVENT, DELETE, MARK, UNMARK, FIND
-            case UNKNOWN -> {
-                throw new UnexpectedCommandException("OOPS!!! I don't know what that means :-(");
-            }
-
-            default -> {
-                assert false : "Unhandled command: " + cmd;
-                throw new UnexpectedCommandException("OOPS!!! I don't know what that means :-(");
-            }
-            }
+            return switch (cmd) {
+            case BYE -> handleBye();
+            case LIST -> handleList();
+            case TODO -> handleTodo(line);
+            case MARK -> handleMark(line);
+            case UNMARK -> handleUnmark(line);
+            case DELETE -> handleDelete(line);
+            case DEADLINE -> handleDeadline(line);
+            case EVENT -> handleEvent(line);
+            case FIND -> handleFind(line);
+            case UPDATE -> handleUpdate(line);
+            case UNKNOWN -> throwUnknown();
+            default -> handleUnhandled(cmd);
+            };
         } catch (UnexpectedCommandException | EmptyTaskException | IOException e) {
             return "Error: " + e.getMessage();
         }
     }
 
+    /* =========================
+     * Command Handlers (1 level)
+     * ========================= */
 
+    private String handleBye() {
+        return "Bye. Hope to see you again soon!";
+    }
+
+    private String handleList() {
+        if (tasks.size() == 0) {
+            return "Your task list is empty.";
+        }
+        return ui.formatList(tasks.all());
+    }
+
+    private String handleTodo(String line) throws EmptyTaskException, IOException, UnexpectedCommandException {
+        Parser.ParsedArgs a = Parser.parseArgs(Parser.Command.TODO, line);
+        Todo todo = new Todo(a.getDesc());
+        tasks.add(todo);
+        storage.appendLine("todo | 0 | " + a.getDesc());
+        return "Added todo: " + todo;
+    }
+
+    private String handleMark(String line) throws EmptyTaskException, IOException, UnexpectedCommandException {
+        Parser.ParsedArgs a = Parser.parseArgs(Parser.Command.MARK, line);
+        if (a.getIndex() < 0 || a.getIndex() >= tasks.size()) {
+            throw new UnexpectedCommandException("Index out of bounds!");
+        }
+        Task t = tasks.get(a.getIndex());
+        t.redo();
+        storage.rewrite(tasks);
+        return "Nice! I’ve marked this task as done:\n  " + t;
+    }
+
+    private String handleUnmark(String line) throws EmptyTaskException, IOException, UnexpectedCommandException {
+        Parser.ParsedArgs a = Parser.parseArgs(Parser.Command.UNMARK, line);
+        if (a.getIndex() < 0 || a.getIndex() >= tasks.size()) {
+            throw new UnexpectedCommandException("Index out of bounds!");
+        }
+        Task t = tasks.get(a.getIndex());
+        t.undo();
+        storage.rewrite(tasks);
+        return "OK, I’ve marked this task as not done yet:\n  " + t;
+    }
+
+    private String handleDelete(String line) throws EmptyTaskException, IOException, UnexpectedCommandException {
+        Parser.ParsedArgs a = Parser.parseArgs(Parser.Command.DELETE, line);
+        if (a.getIndex() < 0 || a.getIndex() >= tasks.size()) {
+            throw new UnexpectedCommandException("Index out of bounds!");
+        }
+        Task removed = tasks.remove(a.getIndex());
+        storage.rewrite(tasks);
+        return "Noted. I’ve removed this task:\n  " + removed
+                + "\nNow you have " + tasks.size() + " tasks in the list.";
+    }
+
+    private String handleDeadline(String line) throws EmptyTaskException, IOException, UnexpectedCommandException {
+        Parser.ParsedArgs a = Parser.parseArgs(Parser.Command.DEADLINE, line);
+        Deadline d = new Deadline(a.getDesc(), a.getBy());
+        tasks.add(d);
+        storage.appendLine("deadline | 0 | " + a.getDesc() + " | " + a.getBy());
+        return "Got it. I’ve added this task:\n  " + d
+                + "\n Now you have " + tasks.size() + " tasks in the list.";
+    }
+
+    private String handleEvent(String line) throws EmptyTaskException, IOException, UnexpectedCommandException {
+        Parser.ParsedArgs a = Parser.parseArgs(Parser.Command.EVENT, line);
+        Event e = new Event(a.getDesc(), a.getFrom(), a.getTo());
+        tasks.add(e);
+        storage.appendLine("event | 0 | " + a.getDesc() + " | " + a.getFrom() + " | " + a.getTo());
+        return "Got it. I’ve added this task:\n  " + e
+                + "\nNow you have " + tasks.size() + " tasks in the list.";
+    }
+
+    private String handleFind(String line) throws EmptyTaskException, UnexpectedCommandException {
+        Parser.ParsedArgs a = Parser.parseArgs(Parser.Command.FIND, line);
+        String needle = a.getFindKeyword().toLowerCase().trim();
+
+        TaskList found = new TaskList(new java.util.ArrayList<>());
+        for (Task t : tasks.all()) {
+            if (t.toString().toLowerCase().contains(needle)) {
+                found.add(t);
+            }
+        }
+
+        return found.size() == 0
+                ? "I couldn’t find any matching tasks."
+                : "Here are the matching tasks in your list:\n" + ui.formatList(found.all());
+    }
+
+    private String handleUpdate(String line) throws EmptyTaskException, UnexpectedCommandException, IOException {
+        Parser.ParsedArgs a = Parser.parseArgs(Parser.Command.UPDATE, line);
+        Task t = tasks.get(a.getIndex());
+        if (!(t instanceof Event)) {
+            throw new UnexpectedCommandException("Task of index " + a.getIndex() + " is not an Event!");
+        }
+        Event e = (Event) t;
+        e.updateEvent(a.getFrom(), a.getTo());
+        storage.rewrite(tasks);
+        return "Updated Event " + a.getIndex() + " successfully!";
+    }
+
+    /* =========================
+     * Tiny helpers for routing
+     * ========================= */
+
+    private String throwUnknown() throws UnexpectedCommandException {
+        throw new UnexpectedCommandException("OOPS!!! I don't know what that means :-(");
+    }
+
+    private String handleUnhandled(Parser.Command cmd) throws UnexpectedCommandException {
+        assert false : "Unhandled command: " + cmd;
+        throw new UnexpectedCommandException("OOPS!!! I don't know what that means :-(");
+    }
 }
