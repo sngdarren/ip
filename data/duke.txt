@@ -3,4 +3,4 @@ deadline | 1 | sleep | 2019-12-01
 todo | 1 | sleep nownownow
 event | 0 | now | 18-sep | 19-sept
 deadline | 0 | i dont want do work | 2025-01-01
-deadline | 0 | go to work | 2019-01-12
+event | 0 | pico | now | now

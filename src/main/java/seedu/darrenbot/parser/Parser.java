@@ -1,7 +1,5 @@
 package seedu.darrenbot.parser;
 
-import java.time.LocalDate;
-
 import seedu.darrenbot.exception.EmptyTaskException;
 import seedu.darrenbot.exception.UnexpectedCommandException;
 
