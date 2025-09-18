@@ -81,21 +81,29 @@ public class Parser {
         case TODO -> {
             String desc = line.substring(5).trim();
             if (desc.isEmpty()) {
-                throw new EmptyTaskException("todo");
+                throw new EmptyTaskException("todo must have a description");
             }
             yield ParsedArgs.todo(desc);
         }
         case DEADLINE -> {
+            LocalDate by;
             int byIndex = line.indexOf("/by ");
             if (byIndex < 0) {
-                throw new EmptyTaskException("deadline");
+                throw new EmptyTaskException("deadline index must be within list range");
             }
             String desc = line.substring(9, byIndex).trim();
             String deadlineString = line.substring(byIndex + 4).trim();
             if (desc.isEmpty()) {
-                throw new EmptyTaskException("deadline");
+                throw new EmptyTaskException("deadline should be in the format: deadline <desc> /from <yyyy-mm-dd>"
+                        + " /to <yyyy-mm-dd>");
             }
-            LocalDate by = LocalDate.parse(deadlineString);
+
+            try {
+                by = java.time.LocalDate.parse(deadlineString); // ISO yyyy-MM-dd only
+            } catch (java.time.format.DateTimeParseException e) {
+                throw new EmptyTaskException("deadline (date must be yyyy-mm-dd)");
+            }
+
             yield ParsedArgs.deadline(desc, by);
         }
         case EVENT -> {
