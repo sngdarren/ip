@@ -174,17 +174,42 @@ public class Parser {
         public static ParsedArgs none() { return new ParsedArgs(); }
 
         /** Creates {@link ParsedArgs} with an index argument. */
-        public static ParsedArgs index(int i) { ParsedArgs a = new ParsedArgs(); a.index = i; return a; }
+        public static ParsedArgs index(int i) {
+            ParsedArgs a = new ParsedArgs();
+            a.index = i;
+            return a;
+        }
 
         /** Creates {@link ParsedArgs} for a todo with a description. */
-        public static ParsedArgs todo(String d) { ParsedArgs a = new ParsedArgs(); a.desc = d; return a; }
+        public static ParsedArgs todo(String d) {
+            ParsedArgs a = new ParsedArgs();
+            a.desc = d;
+            return a;
+        }
 
         /** Creates {@link ParsedArgs} for a deadline with description and date. */
-        public static ParsedArgs deadline(String d, java.time.LocalDate by) { ParsedArgs a = new ParsedArgs(); a.desc = d; a.by = by; return a; }
+        public static ParsedArgs deadline(String d, java.time.LocalDate by) {
+            ParsedArgs a = new ParsedArgs();
+            a.desc = d;
+            a.by = by;
+            return a;
+        }
 
         /** Creates {@link ParsedArgs} for an event with description and time range. */
-        public static ParsedArgs event(String d, String from, String to) { ParsedArgs a = new ParsedArgs(); a.desc = d; a.from = from; a.to = to; return a; }
-        public static ParsedArgs find(String keyword) { ParsedArgs a = new ParsedArgs(); a.findKeyword = keyword; return a; }
+        public static ParsedArgs event(String d, String from, String to) {
+            ParsedArgs a = new ParsedArgs();
+            a.desc = d;
+            a.from = from;
+            a.to = to;
+            return a;
+        }
+
+        /** Creates {@link ParsedArgs} for to find a keyword. */
+        public static ParsedArgs find(String keyword) {
+            ParsedArgs a = new ParsedArgs();
+            a.findKeyword = keyword;
+            return a;
+        }
 
     }
 }

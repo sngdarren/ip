@@ -104,7 +104,6 @@ public class DarrenBot {
     }
 
 
-    @SuppressWarnings("checkstyle:Indentation")
     public String getResponse(String line) {
         try {
             Parser.Command cmd = Parser.parseCommand(line);

@@ -18,9 +18,6 @@ import seedu.darrenbot.tasks.Task;
 import seedu.darrenbot.tasks.TaskList;
 import seedu.darrenbot.tasks.Todo;
 
-
-
-
 /**
  * Handles reading from and writing to the storage file that persists user tasks.
  * <p>
@@ -159,6 +156,7 @@ public class Storage {
      */
     public void rewrite(TaskList tasks) throws IOException {
         List<String> lines = tasks.asStorageLines();
-        Files.write(this.path, lines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        Files.write(this.path, lines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.CREATE);
     }
 }
