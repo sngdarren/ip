@@ -42,8 +42,8 @@ public class MainWindow extends AnchorPane {
     /**
      * Controller for the main GUI.
      */
-    public static final String userImagePath = "/images/gloria.jpg";
-    public static final String dukeImagePath = "/images/motomoto.jpg";
+    public static final String USER_IMAGE_PATH = "/images/gloria.jpg";
+    public static final String DUKE_IMAGE_PATH = "/images/motomoto.jpg";
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -55,8 +55,8 @@ public class MainWindow extends AnchorPane {
 
     private DarrenBot darrenBot;
 
-    private final Image userImage = new Image(this.getClass().getResourceAsStream(userImagePath));
-    private final Image dukeImage = new Image(this.getClass().getResourceAsStream(dukeImagePath));
+    private final Image userImage = new Image(this.getClass().getResourceAsStream(USER_IMAGE_PATH));
+    private final Image dukeImage = new Image(this.getClass().getResourceAsStream(DUKE_IMAGE_PATH));
 
     @FXML
     public void initialize() {
