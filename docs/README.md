@@ -4,14 +4,13 @@
 
 ## Build/Run
 
-- **GUI:** run the JavaFX entrypoint `seedu.darrenbot.gui.Main`.
-- **CLI:** run the entrypoint `seedu.darrenbot.gui.DarrenBot` (contains a `main` method).
-
-If your project uses Gradle/Maven, use your IDE’s run configuration.  
-If you have a fat JAR, you can run:
+- Use Gradle to build and run the application.
+- From the project root, run:
 ```bash
-java -jar yourapp.jar
+./gradlew run
 ```
+
+This will compile the project and start the application.
 
 ---
 
@@ -132,26 +131,6 @@ event | 0 | team sync | 10:30 | 11:15
 
 ---
 
-## Tips & Notes
-
-- **Whitespace:** commands are generally whitespace-tolerant, but keep the overall shape (e.g., `/by`, `/from`, `/to`).
-- **Dates:** deadlines use ISO date (`yyyy-mm-dd`). Events accept free-form `from`/`to` strings.
-- **Indices:** use the index shown by `list` (zero-based).
-
----
-
-## FAQ
-
-- **Is indexing 0-based or 1-based?**  
-  **0-based**. If the first task shows as `0.` in the list, use `0` in commands.
-
-- **Can event times include spaces (e.g., `2025-10-01 10:00`)?**  
-  Some builds accept only single-token `from`/`to`. If your time contains spaces, wrap with quotes only if your parser supports it. Otherwise use compact forms (e.g., `10:00`).
-
-- **Where do I log AI tool usage?**  
-  See `AI.md` at the project root. Update it weekly with which tool you used, what worked/didn’t, and time saved.
-
----
 
 ## AI Usage Log
 
