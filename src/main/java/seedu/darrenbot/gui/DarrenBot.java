@@ -37,7 +37,6 @@ import seedu.darrenbot.ui.Ui;
 
 public class DarrenBot {
 
-
     /** Default file path where tasks are stored persistently. */
     public static final String FILE_PATH = "data/duke.txt";
 
@@ -58,8 +57,6 @@ public class DarrenBot {
         } catch (IOException | UnexpectedCommandException e) {
             // If load fails, start with an empty list but keep the error visible in responses
             loaded = new TaskList(new java.util.ArrayList<>());
-            // Optional: stash an initialization error message if you want to surface it
-            // or log it. For now we just proceed with an empty list.
         }
         this.tasks = loaded;
     }
@@ -182,6 +179,18 @@ public class DarrenBot {
                         : "Here are the matching tasks in your list:\n" + ui.formatList(found.all());
             }
 
+            case UPDATE -> {
+                Parser.ParsedArgs a = Parser.parseArgs(cmd, line);
+                Task t = tasks.get(a.getIndex());
+                if (!(t instanceof Event)) {
+                    throw new UnexpectedCommandException("Task of index " + a.getIndex() + " is not an Event!");
+                }
+
+                Event e = (Event) t;
+                e.updateEvent(a.getFrom(), a.getTo());
+                storage.rewrite(tasks);
+                return "Updated Event " + a.getIndex() + " successfully!";
+            }
             // … same pattern for DEADLINE, EVENT, DELETE, MARK, UNMARK, FIND
             case UNKNOWN -> {
                 throw new UnexpectedCommandException("OOPS!!! I don't know what that means :-(");

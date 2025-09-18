@@ -2,6 +2,7 @@ package seedu.darrenbot.ui;
 
 import java.util.List;
 import java.util.Scanner;
+
 import seedu.darrenbot.tasks.Task;
 
 /**
@@ -39,7 +40,9 @@ public class Ui {
      *         if no input is available
      */
     public String readCommand() {
-        if (!this.scanner.hasNextLine()) return null;
+        if (!this.scanner.hasNextLine()) {
+            return null;
+        }
         return this.scanner.nextLine();
     }
 
@@ -66,11 +69,25 @@ public class Ui {
         StringBuilder sb = new StringBuilder();
         sb.append("Here are the tasks in your list:\n");
         for (int i = 0; i < tasks.size(); i++) {
-            sb.append((i + 1)).append(". ").append(tasks.get(i)).append("\n");
+            sb.append((i)).append(". ").append(tasks.get(i)).append("\n");
         }
         return sb.toString().trim();
     }
 
+    /**
+     * Displays the given list of tasks to the standard output in a numbered format.
+     *
+     * <p>The output begins with a header line:
+     * <pre>
+     * Here are the tasks in your list:
+     * </pre>
+     * followed by each task on its own line, prefixed with its
+     * one-based index (e.g., {@code 1. <task>}).
+     * </p>
+     *
+     * @param tasks the list of {@link Task} objects to display; if empty,
+     *              only the header line is printed
+     */
     public void showList(List<Task> tasks) {
         StringBuilder sb = new StringBuilder();
         sb.append("Here are the tasks in your list:\n");
@@ -88,8 +105,8 @@ public class Ui {
      * @param newSize the new size of the task list after addition
      */
     public void showAdded(Task t, int newSize) {
-        System.out.println("Got it. I've added this task:\n" + t + "\n" +
-                "Now you have " + newSize + " tasks in the list");
+        System.out.println("Got it. I've added this task:\n" + t + "\n"
+                + "Now you have " + newSize + " tasks in the list");
     }
 
     /**
@@ -99,8 +116,8 @@ public class Ui {
      * @param newSize the new size of the task list after removal
      */
     public void showRemoved(Task t, int newSize) {
-        System.out.println("Noted. I've removed this task:" + t + "\n" +
-                "Now you have " + newSize + " tasks in the list.");
+        System.out.println("Noted. I've removed this task:" + t + "\n"
+                + "Now you have " + newSize + " tasks in the list.");
     }
 
     /**

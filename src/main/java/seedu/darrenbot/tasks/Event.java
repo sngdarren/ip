@@ -18,7 +18,7 @@ package seedu.darrenbot.tasks;
 public class Event extends Task {
     private String from;
     private String to;
-    private String taskType;
+    private final String taskType;
 
     /**
      * Constructs an {@code Event} with the given description and time range.
@@ -40,6 +40,17 @@ public class Event extends Task {
 
     public String getTo() {
         return this.to;
+    }
+
+    /**
+     * Updates the start and end times of this event.
+     *
+     * @param from the new starting time of the event
+     * @param to   the new ending time of the event
+     */
+    public void updateEvent(String from, String to) {
+        this.from = from;
+        this.to = to;
     }
 
     public String getTaskType() {

@@ -1,9 +1,9 @@
 package seedu.darrenbot.parser;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 import seedu.darrenbot.exception.EmptyTaskException;
+import seedu.darrenbot.exception.UnexpectedCommandException;
 
 /**
  * Utility class that translates raw user input strings into structured commands
@@ -39,8 +39,8 @@ public class Parser {
         }
         String first = line.split(" ")[0];
         return switch (first) {
-        case "bye" -> Command.BYE;
         case "list" -> Command.LIST;
+        case "bye" -> Command.BYE;
         case "mark" -> Command.MARK;
         case "unmark" -> Command.UNMARK;
         case "deadline" -> Command.DEADLINE;
@@ -48,6 +48,7 @@ public class Parser {
         case "event" -> Command.EVENT;
         case "delete" -> Command.DELETE;
         case "find" -> Command.FIND;
+        case "update" -> Command.UPDATE;
         default -> Command.UNKNOWN;
         };
     }
@@ -70,69 +71,74 @@ public class Parser {
      * @throws EmptyTaskException if the input is missing required arguments
      *                            or if the deadline format is invalid
      */
-    public static ParsedArgs parseArgs(Command cmd, String line) throws EmptyTaskException {
-        try {
-            return switch (cmd) {
-            case MARK, UNMARK, DELETE -> {
-                String[] value = line.split(" ");
-                int idx = Integer.parseInt(value[1]); // 0-based index
-                yield ParsedArgs.index(idx);
-            }
-            case TODO -> {
-                String desc = line.substring(5).trim();
-                if (desc.isEmpty()) {
-                    throw new EmptyTaskException("todo");
-                }
-                yield ParsedArgs.todo(desc);
-            }
-            case DEADLINE -> {
-                int byIndex = line.indexOf("/by ");
-                if (byIndex < 0) {
-                    throw new EmptyTaskException("deadline");
-                }
-                String desc = line.substring(9, byIndex).trim();
-                String deadlineString = line.substring(byIndex + 4).trim();
-                if (desc.isEmpty()) {
-                    throw new EmptyTaskException("deadline");
-                }
-                LocalDate by = LocalDate.parse(deadlineString);
-                yield ParsedArgs.deadline(desc, by);
-            }
-            case EVENT -> {
-                int fromIndex = line.indexOf("/from ");
-                int toIndex = line.indexOf("/to ");
-                if (fromIndex < 0 || toIndex < 0 || toIndex <= fromIndex) {
-                    throw new EmptyTaskException("event");
-                }
-                String desc = line.substring(6, fromIndex).trim();
-                String from = line.substring(fromIndex + 6, toIndex).trim();
-                String to = line.substring(toIndex + 4).trim();
-                if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) {
-                    throw new EmptyTaskException("event");
-                }
-                yield ParsedArgs.event(desc, from, to);
-            }
-            case FIND -> {
-                String kw = line.substring(5).trim(); // after "find "
-                if (kw.isEmpty()) {
-                    throw new EmptyTaskException("find");
-                }
-                yield ParsedArgs.find(kw);
-            }
-
-            default -> ParsedArgs.none();
-            };
-        } catch (IndexOutOfBoundsException | NumberFormatException e) {
-            // Provide a uniform error message depending on the command
-            throw new EmptyTaskException(switch (cmd) {
-                case MARK -> "mark";
-                case UNMARK -> "unmark";
-                case DELETE -> "delete";
-                default -> "command";
-                });
-        } catch (DateTimeParseException e) {
-            throw new EmptyTaskException("deadline (use /by yyyy-mm-dd)");
+    public static ParsedArgs parseArgs(Command cmd, String line) throws EmptyTaskException, UnexpectedCommandException {
+        return switch (cmd) {
+        case MARK, UNMARK, DELETE -> {
+            String[] value = line.split(" ");
+            int idx = Integer.parseInt(value[1]); // 0-based index
+            yield ParsedArgs.index(idx);
         }
+        case TODO -> {
+            String desc = line.substring(5).trim();
+            if (desc.isEmpty()) {
+                throw new EmptyTaskException("todo");
+            }
+            yield ParsedArgs.todo(desc);
+        }
+        case DEADLINE -> {
+            int byIndex = line.indexOf("/by ");
+            if (byIndex < 0) {
+                throw new EmptyTaskException("deadline");
+            }
+            String desc = line.substring(9, byIndex).trim();
+            String deadlineString = line.substring(byIndex + 4).trim();
+            if (desc.isEmpty()) {
+                throw new EmptyTaskException("deadline");
+            }
+            LocalDate by = LocalDate.parse(deadlineString);
+            yield ParsedArgs.deadline(desc, by);
+        }
+        case EVENT -> {
+            int fromIndex = line.indexOf("/from ");
+            int toIndex = line.indexOf("/to ");
+            if (fromIndex < 0 || toIndex < 0 || toIndex <= fromIndex) {
+                throw new EmptyTaskException("event");
+            }
+            String desc = line.substring(6, fromIndex).trim();
+            String from = line.substring(fromIndex + 6, toIndex).trim();
+            String to = line.substring(toIndex + 4).trim();
+            if (desc.isEmpty() || from.isEmpty() || to.isEmpty()) {
+                throw new EmptyTaskException("event");
+            }
+            yield ParsedArgs.event(desc, from, to);
+        }
+        case FIND -> {
+            String kw = line.substring(5).trim();
+            if (kw.isEmpty()) {
+                throw new EmptyTaskException("find");
+            }
+            yield ParsedArgs.find(kw);
+        }
+
+        case UPDATE -> {
+            String[] value = line.split(" ");
+            int idx;
+            if (value.length != 4) {
+                throw new UnexpectedCommandException("Updates are only for Events, try the format 'update <index> "
+                        + "<from> <to>");
+            }
+            try {
+                idx = Integer.parseInt(value[1]);
+            } catch (NumberFormatException e) {
+                throw new UnexpectedCommandException("Index must be an integer.");
+            }
+            String from = value[2];
+            String to = value[3];
+            yield ParsedArgs.updateEvent(idx, from, to);
+        }
+
+        default -> ParsedArgs.none();
+        };
     }
 
     /**
@@ -141,7 +147,7 @@ public class Parser {
      *
      * <p>Each constant corresponds to a specific action that the bot can execute.</p>
      */
-    public enum Command { BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, FIND, UNKNOWN }
+    public enum Command { BYE, LIST, MARK, UNMARK, DEADLINE, TODO, EVENT, DELETE, FIND, UPDATE, UNKNOWN }
 
 
     /**
@@ -164,14 +170,28 @@ public class Parser {
         private String to;
         private String findKeyword;
 
-        public Integer getIndex() { return this.index; }
-        public String getDesc() { return this.desc; }
-        public java.time.LocalDate getBy() { return this.by; }
-        public String getFrom() { return from; }
-        public String getTo() { return to; }
-        public String getFindKeyword() { return findKeyword; }
+        public Integer getIndex() {
+            return this.index;
+        }
+        public String getDesc() {
+            return this.desc;
+        }
+        public java.time.LocalDate getBy() {
+            return this.by;
+        }
+        public String getFrom() {
+            return this.from;
+        }
+        public String getTo() {
+            return this.to;
+        }
+        public String getFindKeyword() {
+            return this.findKeyword;
+        }
         /** Creates an empty {@link ParsedArgs} object. */
-        public static ParsedArgs none() { return new ParsedArgs(); }
+        public static ParsedArgs none() {
+            return new ParsedArgs();
+        }
 
         /** Creates {@link ParsedArgs} with an index argument. */
         public static ParsedArgs index(int i) {
@@ -208,6 +228,15 @@ public class Parser {
         public static ParsedArgs find(String keyword) {
             ParsedArgs a = new ParsedArgs();
             a.findKeyword = keyword;
+            return a;
+        }
+
+        /** Creates {@link ParsedArgs} for to find a keyword. */
+        public static ParsedArgs updateEvent(Integer index, String from, String to) {
+            ParsedArgs a = new ParsedArgs();
+            a.index = index;
+            a.from = from;
+            a.to = to;
             return a;
         }
 
